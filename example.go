@@ -2,8 +2,8 @@ package main
 
 import (
 	"errors"
-	"geeflight/geeflight"
 	"fmt"
+	"github.com/szqmtl/geeflight/geeflight"
 )
 
 func sum(i, j int) (int, int, error) {
