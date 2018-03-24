@@ -8,7 +8,6 @@ import (
 
 func resultHandlerExists(handler ...interface{}) (error, bool, reflect.Value) {
 	hLen := len(handler)
-	fmt.Printf("hLen: %d", hLen)
 	if hLen >= 1 {
 		h := handler[0]
 		if reflect.TypeOf(h).Kind() != reflect.Func {
@@ -39,7 +38,7 @@ func makeParams(funcType reflect.Type, input []reflect.Value, outCount int) []re
 	return params
 }
 
-func Waterfall(fa []interface{}, resultHandler ...interface{}) {
+func Waterfall(fa []interface{}, resultHandler ...interface{})  {
 	err, ok, callBack := resultHandlerExists(resultHandler...)
 	if err != nil {
 		panic( err.Error())
@@ -53,7 +52,7 @@ func Waterfall(fa []interface{}, resultHandler ...interface{}) {
 	var fi []reflect.Value
 	for idx, p := range fa {
 		if reflect.TypeOf(p).Kind() != reflect.Func {
-			panic(fmt.Sprintf("the element(%d) is not a function", idx))
+			panic(fmt.Sprintf("One of the element(%d) is not a function", idx))
 		}
 		v := reflect.TypeOf(p)
 		params := makeParams(v, fi, v.NumIn())
@@ -66,7 +65,7 @@ func Waterfall(fa []interface{}, resultHandler ...interface{}) {
 
 				ret1 := r[retLen-1].Interface()
 				if ret1 != nil {
-					fmt.Printf("Error calling %d: %v\n", idx, ret1)
+					// fmt.Printf("Error calling %d: %v\n", idx, ret1)
 					if ok {
 						params := makeParams(cv, fi, cv.NumIn())
 						params[cv.NumIn()-1] = r[retLen-1]
