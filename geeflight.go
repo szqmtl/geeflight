@@ -1,4 +1,4 @@
-package geeflight
+package main
 
 import (
 	"reflect"
