@@ -44,3 +44,20 @@ Example
     		[]interface{}{ init, sum, sum, sum, sum },
     		handler )
     }
+
+Output:
+
+    i: 1, j: 1
+    i: 2, j: 1
+    i: 3, j: 2
+    i: 5, j: 6, error: <nil>
+    i: 1, j: 1
+    i: 2, j: 1
+    i: 3, j: 2
+    i: 5, j: 6
+    i: 0, j: 0, error: sum is more than 10
+    i: 1, j: 1
+    i: 2, j: 1
+    i: 3, j: 2
+    i: 5, j: 6
+    i: 5, j: 6, error: sum is more than 10
