@@ -67,7 +67,7 @@ func Waterfall(fa []interface{}, resultHandler ...interface{})  {
 				if ret1 != nil {
 					// fmt.Printf("Error calling %d: %v\n", idx, ret1)
 					if ok {
-						params := makeParams(cv, fi, cv.NumIn())
+						params := makeParams(cv, r, cv.NumIn())
 						params[cv.NumIn()-1] = r[retLen-1]
 						callBack.Call(params)
 						return
