@@ -60,7 +60,7 @@ func Waterfall(fa []interface{}, resultHandler ...interface{})  {
 		val := reflect.ValueOf(p)
 		r := val.Call(params)
 		retLen := len(r)
-		if idx != faLen {
+		if idx < faLen - 1 {
 			if retLen > 0 {
 
 				ret1 := r[retLen-1].Interface()
