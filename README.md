@@ -1,7 +1,13 @@
 GeeFlight: another way to organize your golang code
 =================================================
 
-Welcome to GeeFlight, functionalized your business logic without if-err anywhere. The idea is inspired by [caolan/async](http://caolan.github.io/async/).
+Welcome to GeeFlight, functionalized your business logic without if-err everywhere. The idea is inspired by [caolan/async](http://caolan.github.io/async/).
+
+*Menu*
+
+- [Installation](#installation)
+- [Example](#example)
+- [Usage](#usage)
 
 Installation
 ------------
@@ -61,3 +67,18 @@ Output:
     i: 3, j: 2
     i: 5, j: 6
     i: 0, j: 0, error: sum is more than 10
+
+Usage
+-----
+
+- Method Waterfall takes two arguments: function list and optional result handle function
+- If giving a non function parameter, a panic raises
+- Assumptions/approach of function list/result handle function
+    - The preceding function output is the following one input
+    - The last function output is the result handler function's input
+    - The last return item of a function in the list is error
+    - The error object is not as part of the function input, but it is in result handler argument list
+    - If the error object is not nil, the function output is the result handle function input
+    - If the quantity of a output is more than the quantity of the input argument, the excessive part is abandoned, but for the result handle function, the error object is always kept as the last argument.
+    - If the quantity of a output is less than the quantity of the input argument, the system default value is assigned to the missing part, but for the result handle function, the error object is always kept as the last argument.
+    - The return of result handle function is ignored.
