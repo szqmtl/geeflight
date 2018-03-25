@@ -7,7 +7,7 @@ Welcome to GeeFlight, functionalized your business logic without if-err everywhe
 
 - [Installation](#installation)
 - [Example](#example)
-- [Usage](#usage)
+- [Approach](#Approach)
 
 Installation
 ------------
@@ -68,8 +68,8 @@ Output:
     i: 5, j: 6
     i: 0, j: 0, error: sum is more than 10
 
-Usage
------
+Approach
+--------
 
 - Method Waterfall takes two arguments: function list and optional result handle function
 - If giving a non function parameter, a panic raises
