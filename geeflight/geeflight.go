@@ -1,9 +1,9 @@
 package geeflight
 
 import (
-	"reflect"
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 func resultHandlerExists(handler ...interface{}) (error, bool, reflect.Value) {
@@ -87,4 +87,142 @@ func Waterfall(fa []interface{}, resultHandler ...interface{})  {
 		}
 	}
 	return
+}
+
+func convertInterfaceArrayToValueArray(ia []interface{}) []reflect.Value {
+	var rva []reflect.Value = make([]reflect.Value, len(ia))
+	for i := range ia {
+		rva[i] = reflect.ValueOf(rva[i])
+	}
+	return rva
+}
+
+const ErrorMsgFuncPointerExpected string = "the first argument should be a function pointer"
+const ErrorMsgFuncReturnExpected string = "there should be at one return value from the function"
+const ErrorMsgWrongArgNumber string = "the number of Guard argument expects to be executed function argument + function return - error"
+
+func Guard(args ...interface{}) {
+	ret, withErr := exeGuard(args...)
+	if withErr {
+		panic(ret)
+	}
+}
+
+func CGuard(args ...interface{}) {
+	l := len(args)
+	if l < 2 {
+		return
+	}
+
+	oo := args[0]
+	ret, withErr := exeGuard(args[1:]...)
+	fmt.Printf("ret: %v, withErr: %v\n", ret, withErr)
+	if withErr {
+		panic([...]interface{}{oo, ret})
+	}
+}
+
+func exeGuard(args ...interface{}) (interface{}, bool) {
+	l := len(args)
+	if l < 1 {
+		return nil, false
+	}
+
+
+	fp := args[0]
+	at := reflect.TypeOf(fp)
+	if at.Kind() != reflect.Func {
+		return ErrorMsgFuncPointerExpected, true
+	}
+
+	if at.NumOut() < 1 {
+		return ErrorMsgFuncReturnExpected, true
+	}
+
+	if l != (at.NumIn() + at.NumOut()) {
+		return ErrorMsgWrongArgNumber, true
+	}
+
+	var ret []reflect.Value
+	if at.NumIn() > 0 {
+		ret = reflect.ValueOf(fp).Call(makeParams(at, convertInterfaceArrayToValueArray(args[1:at.NumIn()]), at.NumIn()))
+	}else{
+		ret = reflect.ValueOf(fp).Call(nil)
+	}
+
+	fr := ret[at.NumOut()-1]
+	if fr.Interface() != nil {
+		return fr.Interface(), true
+	}
+
+	for i, out := range args[at.NumIn()+ 1: at.NumOut()]{
+		reflect.ValueOf(out).Elem().Set(ret[i])
+	}
+	return nil, false
+}
+
+func CatchGuard(handler func(error)) {
+	r := recover()
+
+	if r == nil {
+		return
+	}
+
+	if IsError(r) {
+		handler(r.(error))
+		return
+	}
+	panic(r)
+}
+
+func CatchCGuard(handler func(interface{}, error)) {
+	r := recover()
+
+	if r == nil {
+		return
+	}
+
+	if reflect.TypeOf(r).Kind() != reflect.Array && len(r.([]interface{})) != 2{
+		panic(r)
+	}
+
+	ra := r.([2]interface{})
+	if IsError(ra[1]) {
+		handler(ra[0], ra[1].(error))
+		return
+	}
+	panic(r)
+}
+
+func CatchIntCGuard(handler func(int, error)) {
+	r := recover()
+
+	if r == nil {
+		return
+	}
+
+	if reflect.TypeOf(r).Kind() != reflect.Array && len(r.([]interface{})) != 2{
+		panic(r)
+	}
+
+	ra := r.([2]interface{})
+	if IsInt(ra[0]) && IsError(ra[1]) {
+		handler(ra[0].(int), ra[1].(error))
+		return
+	}
+	panic(r)
+}
+
+func IsSameType(v interface{}, myType interface{}) bool {
+	return reflect.TypeOf(v) == reflect.TypeOf(myType)
+}
+
+func IsError(e interface{}) bool {
+	_, ok := (e).(error)
+	return ok
+}
+
+func IsInt(e interface{}) bool {
+	_, ok := (e).(int)
+	return ok
 }
